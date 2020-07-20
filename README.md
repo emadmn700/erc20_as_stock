@@ -2,6 +2,7 @@
 
 Hi, I'm an ethereum lover and i'm not so glad that there are lots of of shit-tokens on ethereum network instead of company stocks existing as ERC20 tokens.
 so i've changed an ERC20 contract token so it can be used as a company stock...
+
 you may ask what's the diffrence either ?
 a token (even a very useful one like chainlink or stable-coins or DeFi ones) doesn't produce value (not talking about DeFi staking or the ones which issue new tokens) but a company stock does...
 By owning a stock paper(token) , you have certain rights including receiving a fraction of the company profit
