@@ -41,7 +41,7 @@ I've set three possiblities which i'll be happy if you'd improve it (they're in 
 
 ### starting profit distribution
 
-for this job the owner has to send the amount of profit in ETH to the contract (also has to change the gas limit of the transaction to at least 60K)
+for this job the owner has to send the amount of profit in ETH to the contract (has to change the gas limit of the transaction to at least 60K)
 
 ```
 if(msg.sender == owner && msg.value != 0){
