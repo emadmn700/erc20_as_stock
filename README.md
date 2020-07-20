@@ -15,6 +15,7 @@ usual people are gonna use this so forget any contract-function-call... so i did
 
 
 FIRST i have to tell you the profit is in ETH and i'll be so glad if you write your own version which works with a stablecoin as the profit
+
 SECOND as ethereum is not still scalable, there is HUGE COSTS distributing the profit which the company owner can not afford so the stock owners have to call the contract manually (an also change the gas limit as you'll see, it might even cost them up to 1$)
 
 ### withdrawal time
