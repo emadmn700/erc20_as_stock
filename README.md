@@ -90,4 +90,4 @@ this structure causes price pump during profit distribution period and also exch
 
 i'm waiting for you to improve the code in which stock owners have to stake their tokens for a while
 
-## more details in the code comments
+### more details in the code comments
