@@ -61,7 +61,7 @@ function AllowWithdrawal() payable external{
 
 for this job the owner has to call the contract, the remainig balance is the profit of those who didn't withdraw
 
-in my case it's sent backed to the owner, you can write other scenarios
+in my case it's sent back to the owner, you can write other scenarios
 
 ```
 function DisallowWithdrawal() payable external{
