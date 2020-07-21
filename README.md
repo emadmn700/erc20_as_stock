@@ -11,7 +11,7 @@ By owning a stock paper(token) , you have certain rights including receiving a f
 
 ## I had to set some rules
 
-usual people are gonna use this so forget any contract-function-call... so i did put a set or rules which i'm gonna explain
+usual people are gonna use this so forget any contract-function-call except for the owner...
 
 
 FIRST i have to tell you the profit is in ETH and i'll be so glad if you write your own version which works with a stablecoin as the profit
@@ -34,32 +34,44 @@ i've explained more in the code comments
 
 ### how the contract is being interacted
 
-there's no function to interact but the proccess is done by sending an ETH transaction to the contract address (can have 0 ETH value but the fee will apply)
+FOR STOCK OWNERS : the proccess is done by sending an ETH transaction to the contract address (will have 0 ETH value but the fee will apply, have to change gas limit)
 
+FOR CONTRACT OWNER : there are two function to start and end the profit distribution period
 
-I've set three possiblities which i'll be happy if you'd improve it (they're in the no-name payable function)
+possiblity : we might change the rule that stock owners have to send 0 amount of token to for exmple their own address so there MIGHT be no gas limit change
+
+my opinion : stock owners and normal people won't approve contract function call, either of the two ways mentioned should be used
 
 ### starting profit distribution
 
-for this job the owner has to send the amount of profit in ETH to the contract (has to change the gas limit of the transaction to at least 60K)
+for this job the owner has to call the contract
 
 ```
-if(msg.sender == owner && msg.value != 0){
+function AllowWithdrawal() payable external{
+    require( msg.sender == owner );
     require( !withdrawal_allowed , "You first have to end the corrent profit distribution proccess then you can start a new one" );
     withdrawal_allowed = true;
-    profit = address(this).balance;  
+    // the profit whih is gonna be distributed is the whole contract ETH balance
+    profit = address(this).balance;
+    emit WithdrawalAllowed(profit);
 }
 ```
 
 ### ending profit distribution
 
-for this job the owner has to send zero amount of ETH to the contract (also has to change the gas limit)
+for this job the owner has to call the contract, the remainig balance is the profit of those who didn't withdraw
+
+in my case it's sent backed to the owner, you can write other scenarios
 
 ```
-if(msg.sender == owner && msg.value == 0){
+function DisallowWithdrawal() payable external{
+    require( msg.sender == owner , "so what do you think you're doing?");
     require( withdrawal_allowed , "You first have to start the proccess of distributing profit then you may end it" );
     withdrawal_allowed = false;
     distribution_count++;
+    uint256 remaining = address(this).balance;
+    msg.sender.transfer( remaining );                // the profit of those who didn't withdraw will sent back to the owner :)
+    emit WithdrawalDisallowed(remaining);
 }
 ```
 
@@ -69,18 +81,20 @@ obviously every address is gonna receive a fraction : ( address-balance / stock-
 
 they (stock owners) have to send a transaction (ofcourse 0 value of ETH) to the contract address
 
-the point is that they have to change the gas limit to at least 70K (and ofcourse they must have some ETH in their address to pay the fee) 
+the point is that they have to change the gas limit (and ofcourse they must have some ETH in their address to pay the fee)
+
+i'll soon update how much gas is required
 
 ```
-if(msg.sender != owner){
+function () payable external {
+    require( msg.sender != owner);
     require( !withdrawn[distribution_count][msg.sender] , "You've already withdrawn your profit" );
     require( withdrawal_allowed , "withdrawal time has been finished" );
     withdrawn[distribution_count][msg.sender] = true;
-    
-    uint256 profit_amount = balances[msg.sender]*profit / ( totalSupply - balances[owner] );
-    // address-balance devided by stock-owners-supply is the fraction of every one in the company so they will receive that fraction of profit
-    msg.sender.transfer( profit_amount );
-    emit ProfitReceived(msg.sender , profit_amount);
+
+    uint256 amount = balances[msg.sender]*profit / ( totalSupply - balances[owner] );
+    msg.sender.transfer( amount );
+    emit ProfitReceived(msg.sender , amount);
 }
 ```
 
