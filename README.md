@@ -65,7 +65,7 @@ in my case it's sent back to the owner, you can write other scenarios
 
 ```
 function DisallowWithdrawal() payable external{
-    require( msg.sender == owner , "so what do you think you're doing?");
+    require( msg.sender == owner );
     require( withdrawal_allowed , "You first have to start the proccess of distributing profit then you may end it" );
     withdrawal_allowed = false;
     distribution_count++;
