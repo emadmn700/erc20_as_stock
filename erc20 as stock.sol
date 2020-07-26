@@ -48,7 +48,7 @@ contract ERC20_AS_STOCK {
         require( msg.sender != owner , "what the hell are you doing manager?");
         // stock owners have to send a transaction to the contract ( 0 ETH value ofcourse , just the fee will apply for them ) to withdraw their profit
         // note that it's diffrent from token transferring and they have to send (0 ofcourse) ETH to the contract address
-        // the point is that the stock owners who's gonna withdraw their profit have to change the gas limit ( i'll update the needed gas soon )
+        // the point is that the stock owners who's gonna withdraw their profit have to change the gas limit ( 80,000 is enough )
         // the gas limit for ETH transaction is default set to 21000 but it's not enough as some proccess is happening here
         // Sorry for this structure but i think it was best...
         // changing gas limit and sending an amount is much easier for usual people rather than calling a function of the contract 
@@ -76,7 +76,7 @@ contract ERC20_AS_STOCK {
     }
     
     // just sending 0 ETH to this function will end withdrawal time and send back the remaining value to the owner
-    function DisallowWithdrawal() payable external{
+    function DisallowWithdrawal() external{
         require( msg.sender == owner , "so what do you think you're doing?");
         require( withdrawal_allowed , "You first have to start the proccess of distributing profit then you may end it" );
         withdrawal_allowed = false;
