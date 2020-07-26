@@ -44,7 +44,7 @@ my opinion : stock owners and normal people won't approve contract function call
 
 ### starting profit distribution
 
-for this job the owner has to call the contract
+for this job the owner has to send ETH (profit) to this function
 
 ```
 function AllowWithdrawal() payable external{
