@@ -64,7 +64,7 @@ for this job the owner has to call the contract, the remainig balance is the pro
 in my case it's sent back to the owner, you can write other scenarios
 
 ```
-function DisallowWithdrawal() payable external{
+function DisallowWithdrawal() external{
     require( msg.sender == owner );
     require( withdrawal_allowed , "You first have to start the proccess of distributing profit then you may end it" );
     withdrawal_allowed = false;
@@ -81,9 +81,7 @@ obviously every address is gonna receive a fraction : ( address-balance / stock-
 
 they (stock owners) have to send a transaction (ofcourse 0 value of ETH) to the contract address
 
-the point is that they have to change the gas limit (and ofcourse they must have some ETH in their address to pay the fee)
-
-i'll soon update how much gas is required
+the point is that they have to change the gas limit ( 80,000 is enough and ofcourse they must have some ETH in their address to pay the fee)
 
 ```
 function () payable external {
