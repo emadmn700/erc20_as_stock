@@ -8,7 +8,7 @@ contract ERC20_AS_STOCK {
     // a 2D array which in every profit distribution time matches addresses to their state of withdrawal
     mapping (uint64 =>  mapping (address => bool) ) withdrawn;      
     
-    // contract events (i wonder if anyone listens to them... just maybe crypto news sites)
+    // contract events (i wonder if anyone listens to them...)
     event ProfitReceived(address indexed receiver,uint amount);
     event WithdrawalAllowed(uint profit_amount);
     event WithdrawalDisallowed(uint remaining_amount);
@@ -40,7 +40,7 @@ contract ERC20_AS_STOCK {
         require(balances[msg.sender] >= _value);
         balances[msg.sender] -= _value;
         balances[_to] += _value;
-        emit Transfer(msg.sender, _to, _value);         // raising the transfer event (doesn't matter for us)
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
@@ -75,7 +75,7 @@ contract ERC20_AS_STOCK {
         emit WithdrawalAllowed(profit);
     }
     
-    // just sending 0 ETH to this function will end withdrawal time and send back the remaining value to the owner
+    // calling this function will end withdrawal time and send back the remaining value to the owner
     function DisallowWithdrawal() external{
         require( msg.sender == owner , "so what do you think you're doing?");
         require( withdrawal_allowed , "You first have to start the proccess of distributing profit then you may end it" );
