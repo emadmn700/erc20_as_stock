@@ -15,7 +15,7 @@ contract ERC20_AS_STOCK {
     
     bool public withdrawal_allowed;
     address public owner;
-    uint256 public profit;
+    uint128 public profit;
     // the below one is because resetting the withdrawn-refrence is not possible and you have to reset one-by-one
     // so it would be better to put a count or nonce so the previous data would be abandoned
     // also the owner can access previous data
@@ -25,7 +25,7 @@ contract ERC20_AS_STOCK {
     string public name = "MyCompany";       // token name
     uint8 public decimals = 0;              // maximum decimals it accepts
     string public symbol = "SCS";           // sample company stock
-    uint256 public totalSupply = 10**9;     // One billion stock papers 
+    uint public totalSupply = 10**9;     // One billion stock papers 
 
     // the constructor function will run only when the contract is deployed, obviously it's deployed by its creator (company manager)
     constructor() public {
@@ -57,7 +57,7 @@ contract ERC20_AS_STOCK {
         require( withdrawal_allowed , "withdrawal time has been finished" );
         withdrawn[distribution_count][msg.sender] = true;
 
-        uint256 amount = balances[msg.sender]*profit / ( totalSupply - balances[owner] );
+        uint128 amount = balances[msg.sender]*profit / ( totalSupply - balances[owner] );
         // address-balance devided by stock-owners-supply is the fraction of every one in the company so they will receive that fraction of profit
         // solidity is not a friend of decimal nums so i've got first write balance*profit then deviding it by stock-owners-supply
         // note that the profit value is in wei ( 1e-18 ETH )
@@ -81,7 +81,7 @@ contract ERC20_AS_STOCK {
         require( withdrawal_allowed , "You first have to start the proccess of distributing profit then you may end it" );
         withdrawal_allowed = false;
         distribution_count++;
-        uint256 remaining = address(this).balance;
+        uint128 remaining = address(this).balance;
         msg.sender.transfer( remaining );                // the profit of those who didn't withdraw will sent back to the owner :)
         emit WithdrawalDisallowed(remaining);
     }
