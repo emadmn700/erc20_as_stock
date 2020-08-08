@@ -25,7 +25,7 @@ contract ERC20_AS_STOCK {
     string public name = "MyCompany";       // token name
     uint8 public decimals = 0;              // maximum decimals it accepts
     string public symbol = "SCS";           // sample company stock
-    uint public totalSupply = 10**9;     // One billion stock papers 
+    uint public totalSupply = 10**9;        // One billion stock papers 
 
     // the constructor function will run only when the contract is deployed, obviously it's deployed by its creator (company manager)
     constructor() public {
