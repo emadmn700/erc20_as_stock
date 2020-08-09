@@ -13,7 +13,7 @@ contract ERC20_AS_STOCK {
     
     bool public withdrawal_allowed;
     address public owner;
-    uint128 public profit;
+    uint256 public profit;
     // the below one is because resetting the withdrawn-refrence is not possible and you have to reset one-by-one
     // so it would be better to put a count or nonce so the previous data would be abandoned
     // also the owner can access previous data
@@ -42,7 +42,7 @@ contract ERC20_AS_STOCK {
     }
     
     // FIRST WAY : stock owners can use this function to withdraw their fraction of the company profit
-    function ReceiveYourProfit() {
+    function ReceiveYourProfit() public{
         require( msg.sender != owner );
         
         require( !withdrawn[distribution_count][msg.sender] , "You've already withdrawn your profit" );
@@ -75,7 +75,7 @@ contract ERC20_AS_STOCK {
         require( withdrawal_allowed , "You first have to start the proccess of distributing profit then you may end it" );
         withdrawal_allowed = false;
         distribution_count++;
-        uint128 remaining = address(this).balance;
+        uint256 remaining = address(this).balance;
         msg.sender.transfer( remaining );                // the value belonging to those who didn't withdraw will be sent back to the owner :)
         emit WithdrawalEnded(remaining);
     }
