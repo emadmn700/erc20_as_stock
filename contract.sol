@@ -7,12 +7,12 @@ contract ERC20_AS_STOCK {
     mapping (uint32 =>  mapping (address => bool) ) public voted;           // uint32 : election_count , bool : voted or not
     mapping (uint32 =>  Proposal[] ) public proposals;                      // uint32 : election_count
     
-    struct Proposal { string title; uint256 vote_count; }
+    struct Proposal { bytes32 title; uint256 vote_count; }
     
     event WithdrawalAllowed(uint profit_amount);
     event WithdrawalEnded(uint remaining_amount);
     event ElectionStarted();
-    event ElectionEnded(string winner_title);
+    event ElectionEnded(bytes32 winner_title);
     
     address public owner;
     uint256 public profit;
@@ -84,7 +84,7 @@ contract ERC20_AS_STOCK {
         emit WithdrawalEnded(remaining);
     }
     
-    function StartElection(string[] _titles) external onlyOwner{
+    function StartElection(bytes32[] calldata _titles) external onlyOwner{
         require( !voting_allowed , "You first have to end the current election then you can start a new one" );
         voting_allowed = true;
         
@@ -94,7 +94,7 @@ contract ERC20_AS_STOCK {
         emit ElectionStarted();
     }
     
-    function EndElection() external onlyOwner returns(string winner_title){
+    function EndElection() external onlyOwner returns(bytes32 winner_title){
         require( voting_allowed , "You first have to start an election then you may end it" );
         voting_allowed = false;
         
