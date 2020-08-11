@@ -2,7 +2,7 @@ pragma solidity ^0.5.16;
 
 contract ERC20_AS_STOCK {
 
-    mapping (address => uint256) public balances;      
+    mapping (address => uint256) public balances;
     mapping (uint32 =>  mapping (address => bool) ) public withdrawn;       // uint32 : distribution_count , bool : profit received or not
     mapping (uint32 =>  mapping (address => bool) ) public voted;           // uint32 : election_count , bool : voted or not
     mapping (uint32 =>  Proposal[] ) public proposals;                      // uint32 : election_count
@@ -11,6 +11,8 @@ contract ERC20_AS_STOCK {
     
     event WithdrawalAllowed(uint profit_amount);
     event WithdrawalEnded(uint remaining_amount);
+    event ElectionStarted();
+    event ElectionEnded(string winner_title);
     
     address public owner;
     uint256 public profit;
@@ -89,6 +91,7 @@ contract ERC20_AS_STOCK {
         for (uint i = 0; i < _titles.length; i++) {
             proposals[election_count].push( Proposal( { title: _titles[i] , vote_count: 0 } ) );
         }
+        emit ElectionStarted();
     }
     
     function EndElection() external onlyOwner returns(string winner_title){
@@ -104,6 +107,7 @@ contract ERC20_AS_STOCK {
         }
         
         election_count++;
+        emit ElectionEnded(winner_title);
     }
     
     function Vote(uint _id) external{
