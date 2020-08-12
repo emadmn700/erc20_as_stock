@@ -5,14 +5,12 @@ contract ERC20_AS_STOCK {
     mapping (address => uint256) public balances;
     mapping (uint32 =>  mapping (address => bool) ) public withdrawn;       // uint32 : distribution_count , bool : profit received or not
     mapping (uint32 =>  mapping (address => bool) ) public voted;           // uint32 : election_count , bool : voted or not
-    mapping (uint32 =>  Proposal[] ) public proposals;                      // uint32 : election_count
+    mapping (uint32 =>  mapping (uint8 => uint256) ) public proposals;      // uint32 : election_count , uint8 : proposal_id , uint256 : proposal_vote_count
     
-    struct Proposal { bytes32 title; uint256 vote_count; }
-    
-    event WithdrawalAllowed(uint profit_amount);
-    event WithdrawalEnded(uint remaining_amount);
+    event WithdrawalAllowed(uint256 profit_amount);
+    event WithdrawalEnded(uint256 remaining_amount);
     event ElectionStarted();
-    event ElectionEnded(bytes32 winner_title);
+    event ElectionEnded();
     
     address public owner;
     uint256 public profit;
@@ -84,39 +82,28 @@ contract ERC20_AS_STOCK {
         emit WithdrawalEnded(remaining);
     }
     
-    function StartElection(bytes32[] calldata _titles) external onlyOwner{
+    function StartElection() external onlyOwner{
         require( !voting_allowed , "You first have to end the current election then you can start a new one" );
         voting_allowed = true;
         
-        for (uint i = 0; i < _titles.length; i++) {
-            proposals[election_count].push( Proposal( { title: _titles[i] , vote_count: 0 } ) );
-        }
         emit ElectionStarted();
     }
     
-    function EndElection() external onlyOwner returns(bytes32 winner_title){
+    function EndElection() external onlyOwner{
         require( voting_allowed , "You first have to start an election then you may end it" );
         voting_allowed = false;
         
-        uint winningVoteCount = 0;
-        for (uint p = 0; p < proposals[election_count].length; p++) {
-            if (proposals[election_count][p].vote_count > winningVoteCount) {
-                winningVoteCount = proposals[election_count][p].vote_count;
-                winner_title = proposals[election_count][p].title;
-            }
-        }
-        
         election_count++;
-        emit ElectionEnded(winner_title);
+        emit ElectionEnded();
     }
     
-    function Vote(uint _id) external{
+    function Vote(uint8 _id) external{
         require( !voted[election_count][msg.sender] , "Changing the vote is not possible" );
         require( voting_allowed , "the voting period has been finished" );
         voted[election_count][msg.sender] = true;
         
         // The weight of everyone in voting is their balance
-        proposals[election_count][_id].vote_count += balances[msg.sender];
+        proposals[election_count][_id] += balances[msg.sender];
     } 
     
     // The below functions are no matter for us, just for respecting the ERC20 standard
