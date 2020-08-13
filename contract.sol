@@ -48,8 +48,6 @@ contract ERC20_AS_STOCK {
     
     // FIRST WAY : stock owners can use this function to withdraw their fraction of the company profit
     function ReceiveYourProfit() public{
-        require( msg.sender != owner );
-        
         require( !withdrawn[distribution_count][msg.sender] , "You've already withdrawn your profit" );
         require( withdrawal_allowed , "withdrawal time has been finished" );
         withdrawn[distribution_count][msg.sender] = true;
@@ -70,6 +68,7 @@ contract ERC20_AS_STOCK {
         withdrawal_allowed = true;
         // the profit whih is gonna be distributed is the whole contract ETH balance
         profit = address(this).balance;
+        withdrawn[distribution_count][owner] = true;     // it'd be a bug if the owner transfers during withdrawal time
         emit WithdrawalAllowed(profit);
     }
     
@@ -99,7 +98,7 @@ contract ERC20_AS_STOCK {
         emit ElectionEnded();
     }
     
-    // The company owner will announce which id belong to which proposal or candidate
+    // The company owner will announce which id belongs to which proposal or candidate
     function Vote(uint8 _id) external{
         require( !voted[election_count][msg.sender] , "Changing the vote is not possible" );
         require( voting_allowed , "the voting period has been finished" );
