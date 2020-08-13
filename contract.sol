@@ -82,6 +82,7 @@ contract ERC20_AS_STOCK {
         emit WithdrawalEnded(remaining);
     }
     
+    // No need to input the proposal or candidate names, the contract owner will announce instructions separately
     function StartElection() external onlyOwner{
         require( !voting_allowed , "You first have to end the current election then you can start a new one" );
         voting_allowed = true;
@@ -89,6 +90,7 @@ contract ERC20_AS_STOCK {
         emit ElectionStarted();
     }
     
+    // No need to return the winner_id , everyone's vote count is seen
     function EndElection() external onlyOwner{
         require( voting_allowed , "You first have to start an election then you may end it" );
         voting_allowed = false;
@@ -97,6 +99,7 @@ contract ERC20_AS_STOCK {
         emit ElectionEnded();
     }
     
+    // The company owner will announce which id belong to which proposal or candidate
     function Vote(uint8 _id) external{
         require( !voted[election_count][msg.sender] , "Changing the vote is not possible" );
         require( voting_allowed , "the voting period has been finished" );
@@ -104,7 +107,7 @@ contract ERC20_AS_STOCK {
         
         // The weight of everyone in voting is their balance
         proposals[election_count][_id] += balances[msg.sender];
-    } 
+    }
     
     // The below functions are no matter for us, just for respecting the ERC20 standard
 
