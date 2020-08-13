@@ -57,7 +57,7 @@ contract ERC20_AS_STOCK {
     }
     
     // SECOND WAY : stock owners can send a transaction (with 0 amount of ETH ofcourse) to the contract address for withdrawal, just the fee will apply
-    // note that they have to change the gas limit (60K is enough)
+    // note that they have to change the gas limit (70K is enough)
     function () payable external {
         ReceiveYourProfit();
     }
