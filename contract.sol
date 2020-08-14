@@ -36,6 +36,7 @@ contract ERC20_AS_STOCK {
 
     function transfer(address _to, uint256 _value) external returns (bool success) {
         
+        require( !(withdrawal_allowed && msg.sender == owner) , "You just can't transfer during withdrawal time");
         require( !withdrawn[distribution_count][msg.sender] , "As you've received the company stock profit, you can't transfer untill withdrawal time is ended");
         require( !voted[election_count][msg.sender] , "As you have voted, you can't transfer untill voting time is ended");
         
@@ -49,7 +50,7 @@ contract ERC20_AS_STOCK {
     // FIRST WAY : stock owners can use this function to withdraw their fraction of the company profit
     function ReceiveYourProfit() public{
         require( !withdrawn[distribution_count][msg.sender] , "You've already withdrawn your profit" );
-        require( withdrawal_allowed , "withdrawal time has been finished" );
+        require( withdrawal_allowed , "Withdrawal time has been finished" );
         withdrawn[distribution_count][msg.sender] = true;
 
         msg.sender.transfer( balances[msg.sender]*profit / ( totalSupply - balances[owner] ) );
@@ -68,7 +69,6 @@ contract ERC20_AS_STOCK {
         withdrawal_allowed = true;
         // the profit whih is gonna be distributed is the whole contract ETH balance
         profit = address(this).balance;
-        withdrawn[distribution_count][owner] = true;     // it'd be a bug if the owner transfers during withdrawal time
         emit WithdrawalAllowed(profit);
     }
     
@@ -98,10 +98,10 @@ contract ERC20_AS_STOCK {
         emit ElectionEnded();
     }
     
-    // The company owner will announce which id belongs to which proposal or candidate
+    // The company owner will announce which id belong to which proposal or candidate
     function Vote(uint8 _id) external{
-        require( !voted[election_count][msg.sender] , "Changing the vote is not possible" );
-        require( voting_allowed , "the voting period has been finished" );
+        require( !voted[election_count][msg.sender] , "Changing vote is not possible" );
+        require( voting_allowed , "The voting period has been finished" );
         voted[election_count][msg.sender] = true;
         
         // The weight of everyone in voting is their balance
@@ -135,6 +135,7 @@ contract ERC20_AS_STOCK {
     }
 
     function approve(address _spender, uint256 _value) external returns (bool success) {
+        require( msg.sender != owner , "This option is not available for you");
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
