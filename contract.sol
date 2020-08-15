@@ -25,7 +25,7 @@ contract ERC20_AS_STOCK {
     uint public totalSupply = 10**9;        // One billion stock papers 
 
     modifier onlyOwner {
-        require( msg.sender == chairperson, "Only owner can call this function." );
+        require( msg.sender == chairperson, "So what are you doing exactly?" );
         _;
     }
 
@@ -47,7 +47,7 @@ contract ERC20_AS_STOCK {
         return true;
     }
     
-    // FIRST WAY : stock owners can use this function to withdraw their fraction of the company profit
+    // FIRST WAY : stock-owners (shareholders) can use this function to withdraw their fraction of the company profit
     function ReceiveYourProfit() public{
         require( msg.sender != chairperson );
         require( !withdrawn[distribution_count][msg.sender] , "You've already withdrawn your profit" );
@@ -55,17 +55,17 @@ contract ERC20_AS_STOCK {
         withdrawn[distribution_count][msg.sender] = true;
 
         msg.sender.transfer( balances[msg.sender]*profit / ( totalSupply - balances[chairperson] ) );
-        // address-balance ÷ stock-owners-supply is the fraction of everyone in the company so they will receive that fraction of profit
+        // address-balance ÷ shareholders-supply is the fraction of everyone in the company so they will receive that fraction of profit
     }
     
-    // SECOND WAY : stock owners can send a transaction (with 0 amount of ETH ofcourse) to the contract address for withdrawal, just the fee will apply
-    // note that they have to change the gas limit (70K is enough)
+    // SECOND WAY : They can send a transaction (with 0 amount of ETH ofcourse) to the contract address for withdrawal, just the fee will apply
+    // note that the gas limit has to be changed (70K is enough)
     function () payable external {
         ReceiveYourProfit();
     }
     
     // The chairperson has to send the profit in ETH to this function
-    // IMPORTANT : the ETH sent by the chairperson to this function is the value which is gonna be received by the stock owners and not him.
+    // IMPORTANT : the ETH sent by the chairperson to this function is the value which is gonna be received by the shareholders and not him.
     function AllowWithdrawal() payable external onlyOwner{
         require( !withdrawal_allowed , "You first have to end the current profit distribution proccess then you can start a new one" );
         withdrawal_allowed = true;
