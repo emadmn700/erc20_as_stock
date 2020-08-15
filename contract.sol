@@ -12,7 +12,7 @@ contract ERC20_AS_STOCK {
     event ElectionStarted();
     event ElectionEnded();
     
-    address public owner;
+    address public chairperson;
     uint256 public profit;
     bool public withdrawal_allowed;
     bool public voting_allowed;
@@ -25,18 +25,18 @@ contract ERC20_AS_STOCK {
     uint public totalSupply = 10**9;        // One billion stock papers 
 
     modifier onlyOwner {
-        require( msg.sender == owner, "Only owner can call this function." );
+        require( msg.sender == chairperson, "Only owner can call this function." );
         _;
     }
 
     constructor() public {
-        owner = msg.sender;
+        chairperson = msg.sender;
         balances[msg.sender] = totalSupply;
     }
 
     function transfer(address _to, uint256 _value) external returns (bool success) {
         
-        require( !(withdrawal_allowed && msg.sender == owner) , "You just can't transfer during withdrawal time");
+        require( !(withdrawal_allowed && msg.sender == chairperson) , "You just can't transfer during withdrawal time");
         require( !withdrawn[distribution_count][msg.sender] , "As you've received the company stock profit, you can't transfer untill withdrawal time is ended");
         require( !voted[election_count][msg.sender] , "As you have voted, you can't transfer untill voting time is ended");
         
@@ -49,11 +49,12 @@ contract ERC20_AS_STOCK {
     
     // FIRST WAY : stock owners can use this function to withdraw their fraction of the company profit
     function ReceiveYourProfit() public{
+        require( msg.sender != chairperson );
         require( !withdrawn[distribution_count][msg.sender] , "You've already withdrawn your profit" );
         require( withdrawal_allowed , "Withdrawal time has been finished" );
         withdrawn[distribution_count][msg.sender] = true;
 
-        msg.sender.transfer( balances[msg.sender]*profit / ( totalSupply - balances[owner] ) );
+        msg.sender.transfer( balances[msg.sender]*profit / ( totalSupply - balances[chairperson] ) );
         // address-balance ÷ stock-owners-supply is the fraction of everyone in the company so they will receive that fraction of profit
     }
     
@@ -63,7 +64,8 @@ contract ERC20_AS_STOCK {
         ReceiveYourProfit();
     }
     
-    // The owner has to send the profit in ETH to this function(note that he's not gonna send his own fraction)
+    // The chairperson has to send the profit in ETH to this function
+    // IMPORTANT : the ETH sent by the chairperson to this function is the value which is gonna be received by the stock owners and not him.
     function AllowWithdrawal() payable external onlyOwner{
         require( !withdrawal_allowed , "You first have to end the current profit distribution proccess then you can start a new one" );
         withdrawal_allowed = true;
@@ -77,11 +79,11 @@ contract ERC20_AS_STOCK {
         withdrawal_allowed = false;
         distribution_count++;
         uint256 remaining = address(this).balance;
-        msg.sender.transfer( remaining );                // the value belonging to those who didn't withdraw will be sent back to the owner :)
+        msg.sender.transfer( remaining );                // the value belonging to those who didn't withdraw will be sent back to the chairperson :)
         emit WithdrawalEnded(remaining);
     }
     
-    // No need to input the proposal or candidate names, the contract owner will announce instructions separately
+    // No need to input the proposal or candidate names, the chairperson will announce instructions separately
     function StartElection() external onlyOwner{
         require( !voting_allowed , "You first have to end the current election then you can start a new one" );
         voting_allowed = true;
@@ -98,7 +100,7 @@ contract ERC20_AS_STOCK {
         emit ElectionEnded();
     }
     
-    // The company owner will announce which id belong to which proposal or candidate
+    // The chairperson will announce which id belongs to which proposal or candidate
     function Vote(uint8 _id) external{
         require( !voted[election_count][msg.sender] , "Changing vote is not possible" );
         require( voting_allowed , "The voting period has been finished" );
@@ -135,7 +137,7 @@ contract ERC20_AS_STOCK {
     }
 
     function approve(address _spender, uint256 _value) external returns (bool success) {
-        require( msg.sender != owner , "This option is not available for you");
+        require( msg.sender != chairperson , "This option is not available for you");
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
